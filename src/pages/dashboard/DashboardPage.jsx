@@ -121,7 +121,7 @@ export default function DashboardPage() {
           {/* Lojas */}
           <div>
             <p className="mb-3 text-sm font-medium text-ink">Lojas</p>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <StatCard
                 icon={HiOutlineOfficeBuilding}
                 color="bg-orange/10 text-orange-dark"
@@ -146,7 +146,7 @@ export default function DashboardPage() {
           {/* Entregas de hoje */}
           <div>
             <p className="mb-3 text-sm font-medium text-ink">Entregas de hoje</p>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <StatCard
                 icon={HiOutlineTruck}
                 color="bg-orange/10 text-orange-dark"
