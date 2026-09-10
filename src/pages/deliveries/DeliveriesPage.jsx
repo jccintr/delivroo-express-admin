@@ -6,6 +6,7 @@ import { listDeliveries } from '../../api/deliveries';
 import { listCities } from '../../api/cities';
 import { formatCurrency, formatDateTime } from '../../utils/format';
 import { getDeliveryStatusInfo, DELIVERY_STATUS_INFO } from '../../utils/deliveryStatus';
+import DeliveryDetailsDrawer from './DeliveryDetailsDrawer';
 
 export default function DeliveriesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,6 +20,7 @@ export default function DeliveriesPage() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedDelivery, setSelectedDelivery] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -120,7 +122,12 @@ export default function DeliveriesPage() {
             {result.data.map((delivery) => {
               const info = getDeliveryStatusInfo(delivery.status);
               return (
-                <div key={delivery._id} className="rounded-xl border border-line bg-white p-4">
+                <button
+                  key={delivery._id}
+                  type="button"
+                  onClick={() => setSelectedDelivery(delivery)}
+                  className="w-full rounded-xl border border-line bg-white p-4 text-left transition hover:border-orange-dark"
+                >
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <Badge color={info.badgeColor}>{info.label}</Badge>
                     <span className="text-xs text-ink-soft">{formatDateTime(delivery.createdAt)}</span>
@@ -151,7 +158,7 @@ export default function DeliveriesPage() {
                       {delivery.distancia != null ? `${delivery.distancia} km` : '—'}
                     </p>
                   </div>
-                </div>
+                </button>
               );
             })}
 
@@ -181,6 +188,8 @@ export default function DeliveriesPage() {
           </div>
         )
       )}
+
+      <DeliveryDetailsDrawer delivery={selectedDelivery} onClose={() => setSelectedDelivery(null)} />
     </div>
   );
 }
