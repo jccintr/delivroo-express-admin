@@ -13,6 +13,7 @@ import RiderDetailPage from './pages/riders/RiderDetailPage';
 import StoresPage from './pages/stores/StoresPage';
 import StoreDetailPage from './pages/stores/StoreDetailPage';
 import DeliveriesPage from './pages/deliveries/DeliveriesPage';
+import PlatformSettingsPage from './pages/settings/PlatformSettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
               <Route path="/lojas" element={<StoresPage />} />
               <Route path="/lojas/:id" element={<StoreDetailPage />} />
               <Route path="/entregas" element={<DeliveriesPage />} />
+              <Route path="/faturamento" element={<PlatformSettingsPage />} />
             </Route>
           </Route>
 

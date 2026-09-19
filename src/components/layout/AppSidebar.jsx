@@ -5,6 +5,7 @@ import {
   HiOutlineUserGroup,
   HiOutlineOfficeBuilding,
   HiOutlineTruck,
+  HiOutlineCurrencyDollar,
 } from 'react-icons/hi';
 import Logo from '../Logo';
 import { fetchDashboardStats } from '../../api/dashboard';
@@ -14,6 +15,7 @@ const links = [
   { to: '/entregadores', label: 'Entregadores', icon: HiOutlineUserGroup, showPendingBadge: true },
   { to: '/lojas', label: 'Lojas', icon: HiOutlineOfficeBuilding },
   { to: '/entregas', label: 'Entregas', icon: HiOutlineTruck },
+  { to: '/faturamento', label: 'Faturamento', icon: HiOutlineCurrencyDollar },
 ];
 
 // Intervalo de atualização do indicador de pendentes na sidebar — não
