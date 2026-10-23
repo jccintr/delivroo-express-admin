@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Alert, Avatar, Badge, Button, Card, Spinner } from 'flowbite-react';
+import { Alert, Avatar, Badge, Button, Card, Label, Modal, ModalBody, ModalHeader, Spinner, TextInput } from 'flowbite-react';
 import { HiOutlineArrowLeft, HiOutlineBan, HiOutlineCheckCircle, HiOutlineTruck } from 'react-icons/hi';
 import { getStore, setStoreActive } from '../../api/stores';
+import { adjustStoreCredits, getStoreCredits } from '../../api/credits';
 import { formatDateTime } from '../../utils/format';
 import ConfirmModal from '../../components/ui/ConfirmModal';
 
@@ -164,6 +165,8 @@ export default function StoreDetailPage() {
         </Card>
       </div>
 
+      <CreditsCard storeId={id} storeName={store.name} />
+
       <ConfirmModal
         show={confirmAction === 'deactivate'}
         title="Desativar conta da loja"
@@ -185,6 +188,127 @@ export default function StoreDetailPage() {
         onCancel={() => setConfirmAction(null)}
       />
     </div>
+  );
+}
+
+const TYPE_LABELS = { purchase: 'Compra', delivery: 'Entrega', adjustment: 'Ajuste' };
+
+// Saldo de entregas da loja + ajuste manual (cortesia ou correção).
+function CreditsCard({ storeId, storeName }) {
+  const [credits, setCredits] = useState(null);
+  const [error, setError] = useState('');
+  const [adjusting, setAdjusting] = useState(false);
+  const [form, setForm] = useState({ delta: '', note: '' });
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  const load = useCallback(async () => {
+    try {
+      setCredits(await getStoreCredits(storeId));
+    } catch (err) {
+      setError(err.message);
+    }
+  }, [storeId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function submit(e) {
+    e.preventDefault();
+    setFormError('');
+    setSaving(true);
+    try {
+      await adjustStoreCredits(storeId, { delta: Number(form.delta), note: form.note.trim() });
+      setAdjusting(false);
+      setForm({ delta: '', note: '' });
+      await load();
+    } catch (err) {
+      setFormError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card className="border-line">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-medium text-ink">Saldo de entregas</p>
+        <Button size="xs" color="light" onClick={() => setAdjusting(true)} disabled={!credits}>
+          Ajustar saldo
+        </Button>
+      </div>
+      {error && <Alert color="failure">{error}</Alert>}
+      {credits && (
+        <>
+          <dl className="grid grid-cols-3 gap-3 text-sm">
+            <Field label="Compradas" value={String(credits.purchased)} />
+            <Field label="Grátis" value={String(credits.free)} />
+            <Field label="Total" value={String(credits.available)} />
+          </dl>
+          {credits.transactions.length > 0 && (
+            <ul className="divide-y divide-line text-sm">
+              {credits.transactions.slice(0, 10).map((t) => (
+                <li key={t._id} className="flex justify-between gap-3 py-2">
+                  <span className="text-ink-soft">
+                    {formatDateTime(t.createdAt)} · {TYPE_LABELS[t.type] || t.type}
+                    {t.note ? ` · ${t.note}` : ''}
+                  </span>
+                  <span className={`font-medium ${t.delta > 0 ? 'text-green' : 'text-red'}`}>
+                    {t.delta > 0 ? `+${t.delta}` : t.delta}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+
+      {adjusting && (
+        <Modal show onClose={() => setAdjusting(false)} size="md">
+          <ModalHeader>Ajustar saldo de {storeName}</ModalHeader>
+          <ModalBody>
+            <form className="flex flex-col gap-4" onSubmit={submit}>
+              {formError && <Alert color="failure">{formError}</Alert>}
+              <div>
+                <Label htmlFor="delta" className="mb-1 block">
+                  Entregas a somar (use negativo para tirar)
+                </Label>
+                <TextInput
+                  id="delta"
+                  type="number"
+                  step="1"
+                  value={form.delta}
+                  onChange={(e) => setForm((p) => ({ ...p, delta: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="note" className="mb-1 block">
+                  Motivo
+                </Label>
+                <TextInput
+                  id="note"
+                  maxLength={200}
+                  placeholder="Ex: cortesia de boas-vindas"
+                  value={form.note}
+                  onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button color="light" onClick={() => setAdjusting(false)} disabled={saving}>
+                  Cancelar
+                </Button>
+                <Button type="submit" className="bg-orange enabled:hover:bg-orange-dark" disabled={saving}>
+                  {saving ? <Spinner size="sm" /> : 'Aplicar'}
+                </Button>
+              </div>
+            </form>
+          </ModalBody>
+        </Modal>
+      )}
+    </Card>
   );
 }
 

@@ -13,9 +13,11 @@ import {
 } from 'react-icons/hi';
 import { useAuth } from '../../context/AuthContext';
 import { fetchDashboardStats } from '../../api/dashboard';
+import { useRecharges } from '../../context/RechargeContext';
 
 export default function DashboardPage() {
   const { admin } = useAuth();
+  const { counts: recharges } = useRecharges();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -62,6 +64,30 @@ export default function DashboardPage() {
         </div>
       ) : stats ? (
         <>
+          {recharges.informed > 0 && (
+            <Link to="/recargas">
+              <Card className="border-2 border-red bg-red-bg transition hover:border-orange-dark">
+                <div className="flex items-center gap-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red/10 text-red">
+                    <HiOutlineExclamationCircle className="h-7 w-7" />
+                  </span>
+                  <div className="flex-1">
+                    <p className="font-heading text-lg font-bold text-ink">
+                      {recharges.informed}{' '}
+                      {recharges.informed === 1
+                        ? 'pagamento informado para conferir'
+                        : 'pagamentos informados para conferir'}
+                    </p>
+                    <p className="text-sm text-ink-soft">
+                      Confira o Pix na sua conta e confirme para liberar as entregas da loja.
+                    </p>
+                  </div>
+                  <HiArrowRight className="h-5 w-5 shrink-0 text-ink-soft" />
+                </div>
+              </Card>
+            </Link>
+          )}
+
           {/* Indicador de entregadores pendentes — o dado mais acionável do
               painel, por isso ganha destaque visual próprio, não é só mais
               um card no grid. */}

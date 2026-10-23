@@ -6,15 +6,20 @@ import {
   HiOutlineOfficeBuilding,
   HiOutlineTruck,
   HiOutlineCurrencyDollar,
+  HiOutlineCash,
+  HiOutlineShoppingBag,
 } from 'react-icons/hi';
 import Logo from '../Logo';
 import { fetchDashboardStats } from '../../api/dashboard';
+import { useRecharges } from '../../context/RechargeContext';
 
 const links = [
   { to: '/dashboard', label: 'Dashboard', icon: HiOutlineViewGrid },
   { to: '/entregadores', label: 'Entregadores', icon: HiOutlineUserGroup, showPendingBadge: true },
   { to: '/lojas', label: 'Lojas', icon: HiOutlineOfficeBuilding },
   { to: '/entregas', label: 'Entregas', icon: HiOutlineTruck },
+  { to: '/recargas', label: 'Recargas', icon: HiOutlineCash, showRechargeBadge: true },
+  { to: '/pacotes', label: 'Pacotes', icon: HiOutlineShoppingBag },
   { to: '/faturamento', label: 'Faturamento', icon: HiOutlineCurrencyDollar },
 ];
 
@@ -25,6 +30,7 @@ const POLLING_INTERVAL_MS = 30000;
 
 export default function AppSidebar({ onNavigate }) {
   const [pendingCount, setPendingCount] = useState(0);
+  const { counts } = useRecharges();
 
   useEffect(() => {
     let active = true;
@@ -54,7 +60,7 @@ export default function AppSidebar({ onNavigate }) {
       </div>
 
       <nav className="flex-1 space-y-1 px-3">
-        {links.map(({ to, label, icon: Icon, showPendingBadge }) => (
+        {links.map(({ to, label, icon: Icon, showPendingBadge, showRechargeBadge }) => (
           <NavLink
             key={to}
             to={to}
@@ -72,6 +78,14 @@ export default function AppSidebar({ onNavigate }) {
             {showPendingBadge && pendingCount > 0 && (
               <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber px-1.5 text-xs font-semibold text-white">
                 {pendingCount > 9 ? '9+' : pendingCount}
+              </span>
+            )}
+            {showRechargeBadge && counts.informed > 0 && (
+              <span
+                aria-label="Pagamentos para conferir"
+                className="flex h-5 min-w-5 animate-pulse items-center justify-center rounded-full bg-red px-1.5 text-xs font-semibold text-white"
+              >
+                {counts.informed > 9 ? '9+' : counts.informed}
               </span>
             )}
           </NavLink>
