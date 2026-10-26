@@ -8,6 +8,7 @@ import {
   HiOutlineCurrencyDollar,
   HiOutlineCash,
   HiOutlineShoppingBag,
+  HiOutlineAdjustments,
 } from 'react-icons/hi';
 import Logo from '../Logo';
 import { fetchDashboardStats } from '../../api/dashboard';
@@ -20,6 +21,7 @@ const links = [
   { to: '/entregas', label: 'Entregas', icon: HiOutlineTruck },
   { to: '/recargas', label: 'Recargas', icon: HiOutlineCash, showRechargeBadge: true },
   { to: '/pacotes', label: 'Pacotes', icon: HiOutlineShoppingBag },
+  { to: '/precos', label: 'Preço da entrega', icon: HiOutlineAdjustments },
   { to: '/faturamento', label: 'Faturamento', icon: HiOutlineCurrencyDollar },
 ];
 

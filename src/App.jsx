@@ -17,6 +17,8 @@ import DeliveriesPage from './pages/deliveries/DeliveriesPage';
 import PackagesPage from './pages/packages/PackagesPage';
 import RechargesPage from './pages/recharges/RechargesPage';
 import PlatformSettingsPage from './pages/settings/PlatformSettingsPage';
+import PricingPage from './pages/pricing/PricingPage';
+import CityPricingPage from './pages/pricing/CityPricingPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
@@ -47,6 +49,8 @@ export default function App() {
               <Route path="/entregas" element={<DeliveriesPage />} />
               <Route path="/recargas" element={<RechargesPage />} />
               <Route path="/pacotes" element={<PackagesPage />} />
+              <Route path="/precos" element={<PricingPage />} />
+              <Route path="/precos/:id" element={<CityPricingPage />} />
               <Route path="/faturamento" element={<PlatformSettingsPage />} />
             </Route>
           </Route>

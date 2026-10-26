@@ -56,6 +56,7 @@ export default function DeliveryDetailsDrawer({ delivery, onClose }) {
             <Section icon={HiOutlineCurrencyDollar} title="Valores">
               <Field label="Repasse ao entregador" value={formatCurrency(delivery.riderPayout)} />
               <Field label="Distância" value={delivery.distancia != null ? `${delivery.distancia} km` : '—'} />
+              <PayoutBreakdown breakdown={delivery.payoutBreakdown} />
             </Section>
 
             {/* Loja */}
@@ -170,6 +171,24 @@ function Section({ icon: Icon, title, children }) {
         </p>
       )}
       <div className="flex flex-col gap-2">{children}</div>
+    </div>
+  );
+}
+
+// Como o repasse foi calculado (gravado na criação da entrega; entregas antigas não têm)
+function PayoutBreakdown({ breakdown }) {
+  if (!breakdown) return null;
+  return (
+    <div className="mt-1 flex flex-col gap-1 rounded-lg bg-cream p-3 text-xs text-ink-soft">
+      <p className="font-medium text-ink">Como foi calculado ({breakdown.source === 'city' ? 'regra da cidade' : 'regra padrão'})</p>
+      <div className="flex justify-between"><span>Valor base</span><span>{formatCurrency(breakdown.baseFee)}</span></div>
+      <div className="flex justify-between"><span>Distância ({breakdown.distanceKm} km × {formatCurrency(breakdown.perKm)})</span><span>{formatCurrency(breakdown.distanceFee)}</span></div>
+      {breakdown.longDistanceExtra > 0 && <div className="flex justify-between"><span>Adicional de distância longa</span><span>{formatCurrency(breakdown.longDistanceExtra)}</span></div>}
+      {breakdown.minimumApplied && <div className="flex justify-between"><span>Valor mínimo aplicado</span><span>{formatCurrency(breakdown.minimumFee)}</span></div>}
+      {breakdown.adjustments?.map((a, i) => (
+        <div key={i} className="flex justify-between"><span>{a.origin === 'rain' ? 'Modo chuva' : a.name}{a.kind === 'percent' ? ` (${a.value}%)` : ''}</span><span>+ {formatCurrency(a.amount)}</span></div>
+      ))}
+      {breakdown.maximumApplied && <div className="flex justify-between"><span>Teto aplicado</span><span>{formatCurrency(breakdown.maximumFee)}</span></div>}
     </div>
   );
 }
